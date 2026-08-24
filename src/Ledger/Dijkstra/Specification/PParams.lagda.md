@@ -129,6 +129,7 @@ record PParams : Type where
     b                             : ℕ
     keyDeposit                    : Coin
     poolDeposit                   : Coin
+    minPoolCost                   : Coin
     monetaryExpansion             : UnitInterval -- formerly: rho
     treasuryCut                   : UnitInterval -- formerly: tau
     coinsPerUTxOByte              : Coin
@@ -282,6 +283,7 @@ module PParamsUpdate where
           a b                           : Maybe ℕ
           keyDeposit                    : Maybe Coin
           poolDeposit                   : Maybe Coin
+          minPoolCost                   : Maybe Coin
           monetaryExpansion             : Maybe UnitInterval
           treasuryCut                   : Maybe UnitInterval
           coinsPerUTxOByte              : Maybe Coin
@@ -348,6 +350,7 @@ module PParamsUpdate where
       ∷ is-just b
       ∷ is-just keyDeposit
       ∷ is-just poolDeposit
+      ∷ is-just minPoolCost
       ∷ is-just monetaryExpansion
       ∷ is-just treasuryCut
       ∷ is-just coinsPerUTxOByte
@@ -462,6 +465,7 @@ module PParamsUpdate where
       ; b                           = U.b ?↗ P.b
       ; keyDeposit                  = U.keyDeposit ?↗ P.keyDeposit
       ; poolDeposit                 = U.poolDeposit ?↗ P.poolDeposit
+      ; minPoolCost                 = U.minPoolCost ?↗ P.minPoolCost
       ; monetaryExpansion           = U.monetaryExpansion ?↗ P.monetaryExpansion
       ; treasuryCut                 = U.treasuryCut ?↗ P.treasuryCut
       ; coinsPerUTxOByte            = U.coinsPerUTxOByte ?↗ P.coinsPerUTxOByte
