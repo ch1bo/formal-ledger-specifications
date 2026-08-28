@@ -56,6 +56,13 @@
             builtins.filter (p: p ? isAgdaDerivation) formal-ledger.buildInputs
           );
 
+          # Version-matched agda-mode (binary + Emacs elisp) from the Agda that
+          # fls-agda embeds; the withPackages wrapper only exposes `agda`.
+          agda-mode = pkgs.runCommand "agda-mode-${pkgs.haskellPackages.Agda.version}" { } ''
+            mkdir -p $out/bin
+            ln -s ${pkgs.haskellPackages.Agda}/bin/agda-mode $out/bin/agda-mode
+          '';
+
           fls-shake-agdaWithPackages = self'.packages.fls-shake.override (_: {
             fls-agda = fls-agdaWithPackages;
           });
@@ -109,6 +116,7 @@
           packages = pkgs' // {
             default = formal-ledger;
             inherit
+              agda-mode
               fls-agdaWithPackages
               fls-shake-agdaWithPackages
               ;
@@ -123,6 +131,7 @@
                 (oldAttrs: {
                   buildInputs = oldAttrs.buildInputs ++ [
                     fls-shake-agdaWithPackages.buildInputs
+                    agda-mode
                   ];
                 });
 

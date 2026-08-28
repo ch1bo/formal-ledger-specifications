@@ -267,55 +267,37 @@ Then make sure that the `~/ledger-agda/bin` directory is in your `PATH` when sta
 
 ### Emacs
 
-1.  **Configure Emacs for version switching**.
+The dev shell puts both the project's `agda` (libraries preconfigured) and a
+**version-matched** `agda-mode` on `PATH`, so the standard Agda setup applies
+and no version-switching machinery is needed: `agda-mode locate` always
+resolves to the Emacs lisp matching the `agda` next to it, and leaving the
+project environment makes your system Agda (if any) apply again.
 
-    Add the following to your [Emacs init file][] (highlight and `M-x eval-region` to load without restarting):
+1.  Load `agda2-mode` via `agda-mode locate`, the standard snippet in your
+    [Emacs init file][]:
 
     ```elisp
-    ;; Defines a function `my/switch-agda' that switches between different
-    ;; `agda' executables defined in `my/agda-versions'. The first entry of
-    ;; `my/agda-versions' is assumed to be the default Agda.
-    ;;
-    ;; If there are two entries in `my/agda-versions', `my/switch-agda' toggles
-    ;; between the two. If there are more entries, it will ask which one
-    ;; to choose.
-    (setq my/agda-versions `(("System Agda"  "2.8.0" "agda")  ; Adjust version as needed
-                             ("Ledger Agda"  "2.7.0.1" "~/ledger-agda/bin/agda")))
-    (setq my/selected-agda (caar my/agda-versions))
-
-    (defun my/switch-agda (name version path)
-      (interactive
-       (cond ((> (length my/agda-versions) 2)
-              (assoc (completing-read "Agda: " my/agda-versions '(lambda (x) 't) 't) my/agda-versions))
-             ((= (length my/agda-versions) 2)
-              (car (seq-filter '(lambda (x) (not (string= my/selected-agda (car x)))) my/agda-versions)))
-             (t (error "my/agda-versions needs to have at least two elements!"))))
-      (message "Selecting %s, version %s" name version)
-      (setq my/selected-agda   name
-            agda2-version      version
-            agda2-program-name path)
-      (agda2-restart))
-
-    ;; Bind the switch function to C-c C-x C-t in agda2-mode
-    (with-eval-after-load 'agda2-mode
-      (define-key agda2-mode-map (kbd "C-c C-x C-t") 'my/switch-agda))
+    (load-file (let ((coding-system-for-read 'utf-8))
+                 (shell-command-to-string "agda-mode locate")))
     ```
 
-    **Notes**
+    Doom Emacs users get this by enabling the `(agda +local)` module instead.
 
-    + Update the system Agda version in `my/agda-versions` to match your installation.
-    + Check your system Agda with `which agda && agda --version`.
-    + Once configured, use `M-x my/switch-agda` (or `C-c C-x C-t`) to switch between Agda versions.
-    + This works with most Emacs distributions (Doom, Spacemacs, vanilla, etc.).
-
-2.  Launch Emacs from within the project's Nix shell to make it aware of the environment:
+2.  Make sure Emacs sees the project environment — either launch it from the
+    Nix shell,
 
     ```bash
     nix develop
     emacs src/Ledger.lagda.md
     ```
 
+    or use direnv integration (e.g. [envrc][], or Doom's `:tools direnv`) with
+    an `.envrc` containing `use flake`, which switches `agda`/`agda-mode`
+    per project automatically.
+
 3.  Use standard `agda-mode` commands (e.g., `C-c C-l` to load a file).
+
+[envrc]: https://github.com/purcell/envrc
 
 
 ### Visual Studio Code
